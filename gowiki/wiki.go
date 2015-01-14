@@ -4,6 +4,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"net/http"
 )
 
 // Page struct
@@ -34,11 +35,20 @@ func loadPage(title string) (*Page, error) {
      return &Page{Title: title, Body: body}, nil
 }
 
+// View handler
+// This handler extracts the page title from the URL (everything after /view/),
+// loads the page from disk, and prints the formatted data to the 
+// http.ResponseWriter.
+// Currently ignores errors from loadPage.
+func viewHandler(w http.ResponseWriter, r *http.Request) {
+     title := r.URL.Path[len("/view/"):]
+     p, _ := loadPage(title)
+     fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", p.Title, p.Body)
+}
+
 // Main function
 // Main entry point for the application.
 func main() {
-     p1 := &Page{Title: "TestPage", Body: []byte("This is my test page")}
-     p1.save()
-     p2, _ := loadPage("TestPage")
-     fmt.Println(string(p2.Body))
+     http.HandleFunc("/view/", viewHandler)
+     http.ListenAndServe(":8000", nil)
 }
