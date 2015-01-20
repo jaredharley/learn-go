@@ -5,7 +5,8 @@ import (
     "fmt"
     _ "github.com/mattn/go-sqlite3"
     "log"
-    "reflect"
+    "os"
+    _ "reflect"
     "strconv"
 )
 
@@ -18,9 +19,9 @@ type User struct {
     email       string
 }
 
-func getUserInfo(id int) *User {
-    fmt.Println("Opening connection to database...")
-    fmt.Printf("id is %d, type of %s\n", id, reflect.TypeOf(id).Kind())
+func getUserInfo(id int) User {
+    //fmt.Println("Opening connection to database...")
+    //fmt.Printf("id is %d, type of %s\n", id, reflect.TypeOf(id).Kind())
     db, err := sql.Open("sqlite3", "./todo-app.db")
     if err != nil {
         fmt.Println("Unable to open database")
@@ -38,6 +39,7 @@ func getUserInfo(id int) *User {
         log.Fatalln(err)
     }
     defer stmt.Close()
+    var myUser User
 
     var uid     int
     var fn      string
@@ -45,16 +47,13 @@ func getUserInfo(id int) *User {
     var dob     string
     var email   string
     err = stmt.QueryRow(id).Scan(&uid, &fn, &ln, &dob, &email)
-    if err != nil {
-        log.Fatalln(err)
+    if err == nil {
+        myUser.id = id
+        myUser.firstname = fn
+        myUser.lastname = ln
+        myUser.dob = dob
+        myUser.email = email
     }
-
-    myUser := new(User)
-    myUser.id = id
-    myUser.firstname = fn
-    myUser.lastname = ln
-    myUser.dob = dob
-    myUser.email = email
 
     return myUser
 }
@@ -62,29 +61,38 @@ func getUserInfo(id int) *User {
 func main() {
     fmt.Println("Welcome to TODO")
     fmt.Println("===============")
-    fmt.Printf("Enter a user id: ")
+    for {
+        fmt.Printf("Enter a user id: ")
+        
+        // Read the input
+        var text string
+        _, err := fmt.Scanf("%s", &text)
+        if err != nil {
+            log.Fatalln(err)
+        }
+        if text == "exit" {
+            // Exits the program
+            os.Exit(0);
+        }
+        
+        // Convert the text string into an int
+        conv, err := strconv.Atoi(text)
+        
+        if err != nil {
+            log.Fatalln("Uh oh! Couldn't convert the user id.\n%s", err)
+            return
+        }
+        
+        // Get the user info as a User struct
+        var userInfo User
+        userInfo = getUserInfo(conv)
     
-    // Read the input
-    var text string
-    _, err := fmt.Scanf("%s", &text)
-    if err != nil {
-        log.Fatalln(err)
+        // Check and see if the returned struct is equal to an empty struct -
+        // this tells us if the returned object was null or not.
+        if userInfo == (User{}) {
+            fmt.Println("That user does not exist.\n")
+        } else {
+            fmt.Printf("User %d is %s %s (%s)\n\n", userInfo.id, userInfo.firstname, userInfo.lastname, userInfo.email)
+        }
     }
-    
-    // Convert the text string into an int
-    conv, err := strconv.Atoi(text)
-    
-    if err != nil {
-        log.Fatalln("Uh oh! Couldn't convert the user id.\n%s", err)
-        return
-    }
-    
-    // Get the user info as a User struct
-    userInfo := getUserInfo(conv)
-    if userInfo == nil {
-        log.Fatalln("The returned user object was null.")
-    }
-
-    fmt.Printf("User %d is %s %s (%s)\n", userInfo.id, userInfo.firstname, userInfo.lastname, userInfo.email)
-    
 }
