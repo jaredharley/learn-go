@@ -9,7 +9,16 @@ import (
     "strconv"
 )
 
-func getUserInfo(id int) string {
+// User struct
+type User struct {
+    id          int
+    firstname   string
+    lastname    string
+    dob         string
+    email       string
+}
+
+func getUserInfo(id int) *User {
     fmt.Println("Opening connection to database...")
     fmt.Printf("id is %d, type of %s\n", id, reflect.TypeOf(id).Kind())
     db, err := sql.Open("sqlite3", "./todo-app.db")
@@ -29,18 +38,25 @@ func getUserInfo(id int) string {
         log.Fatalln(err)
     }
     defer stmt.Close()
-    var firstname string
-    var userid int
-    var lastname string
-    var dob string
-    var email string
-    err = stmt.QueryRow(id).Scan(&userid, &firstname, &lastname, &dob, &email)
+
+    var uid     int
+    var fn      string
+    var ln      string
+    var dob     string
+    var email   string
+    err = stmt.QueryRow(id).Scan(&uid, &fn, &ln, &dob, &email)
     if err != nil {
         log.Fatalln(err)
     }
-    fmt.Printf("User %d is %s\n", id, firstname)
 
-    return "hi"
+    myUser := new(User)
+    myUser.id = id
+    myUser.firstname = fn
+    myUser.lastname = ln
+    myUser.dob = dob
+    myUser.email = email
+
+    return myUser
 }
 
 func main() {
@@ -63,7 +79,12 @@ func main() {
         return
     }
     
-    // Get the user info
-    getUserInfo(conv)
+    // Get the user info as a User struct
+    userInfo := getUserInfo(conv)
+    if userInfo == nil {
+        log.Fatalln("The returned user object was null.")
+    }
+
+    fmt.Printf("User %d is %s %s (%s)\n", userInfo.id, userInfo.firstname, userInfo.lastname, userInfo.email)
     
 }
