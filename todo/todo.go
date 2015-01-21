@@ -19,6 +19,16 @@ type User struct {
     email       string
 }
 
+// Task struct
+type Task struct {
+    id          int
+    userId      int
+    title       string
+    description string
+    due_date    string
+    importance  int
+}
+
 func getUserInfo(id int) User {
     //fmt.Println("Opening connection to database...")
     //fmt.Printf("id is %d, type of %s\n", id, reflect.TypeOf(id).Kind())
@@ -58,41 +68,106 @@ func getUserInfo(id int) User {
     return myUser
 }
 
-func main() {
-    fmt.Println("Welcome to TODO")
-    fmt.Println("===============")
+func lookupUser() {
+Lookup:    
     for {
-        fmt.Printf("Enter a user id: ")
-        
+        fmt.Printf("[User lookup] Enter a user id, (b)ack, or (q)uit: ")
         // Read the input
         var text string
         _, err := fmt.Scanf("%s", &text)
         if err != nil {
             log.Fatalln(err)
         }
-        if text == "exit" {
-            // Exits the program
-            os.Exit(0);
+        
+        switch text {
+            case "q":
+                // Exit the program
+                os.Exit(0);
+            case "b":
+                break Lookup
         }
         
         // Convert the text string into an int
         conv, err := strconv.Atoi(text)
         
+        if err == nil {
+            // Get the user info as a User struct
+            var userInfo User
+            userInfo = getUserInfo(conv)
+                // Check and see if the returned struct is equal to an empty struct -
+            // this tells us if the returned object was null or not.
+            if userInfo == (User{}) {
+                fmt.Println("That user does not exist.\n")
+            } else {
+                fmt.Printf("User %d is %s %s (%s)\n\n", userInfo.id, userInfo.firstname, userInfo.lastname, userInfo.email)
+            }
+        } else {
+            fmt.Printf("%s is not a valid user id\n", text)
+        }
+    }
+}
+
+func lookupTask() {
+Lookup:
+    for {
+        fmt.Printf("[Task lookup] Enter a user id, (b)ack, or (q)uit: ")
+        // Read the input
+        var text string
+        _, err := fmt.Scanf("%s", &text)
         if err != nil {
-            log.Fatalln("Uh oh! Couldn't convert the user id.\n%s", err)
-            return
+            log.Fatalln(err)
         }
         
-        // Get the user info as a User struct
-        var userInfo User
-        userInfo = getUserInfo(conv)
-    
-        // Check and see if the returned struct is equal to an empty struct -
-        // this tells us if the returned object was null or not.
-        if userInfo == (User{}) {
-            fmt.Println("That user does not exist.\n")
-        } else {
-            fmt.Printf("User %d is %s %s (%s)\n\n", userInfo.id, userInfo.firstname, userInfo.lastname, userInfo.email)
+        switch text {
+            case "q":
+                // Exit the program
+                os.Exit(0);
+            case "b":
+                break Lookup
         }
+        
+        // Convert the text string into an int
+        conv, err := strconv.Atoi(text)
+        
+        if err == nil {
+            // Get the user info as a User struct
+            var userTasks Task
+            userInfo = getUserInfo(conv)
+                // Check and see if the returned struct is equal to an empty struct -
+            // this tells us if the returned object was null or not.
+            if userInfo == (User{}) {
+                fmt.Println("That user does not exist.\n")
+            } else {
+                fmt.Printf("User %d is %s %s (%s)\n\n", userInfo.id, userInfo.firstname, userInfo.lastname, userInfo.email)
+            }
+        } else {
+            fmt.Printf("%s is not a valid user id\n", text)
+        }
+    }
+}
+
+func main() {
+    fmt.Println("Welcome to TODO")
+    fmt.Println("===============")
+    for {
+        fmt.Printf("[Main menu] Select an option (u)sers, (t)asks, (q)uit: ")
+        // Read the input
+        var text string
+        _, err := fmt.Scanf("%s", &text)
+        if err != nil {
+            log.Fatalln(err)
+        }
+        
+        switch text {
+            case "q":
+                // Exit the program
+                os.Exit(0);
+            case "u":
+                lookupUser()
+            case "t":
+                lookupTask()
+        }
+
+        
     }
 }
