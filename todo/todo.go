@@ -131,8 +131,8 @@ Lookup:
         
         if err == nil {
             // Get the user info as a User struct
-            var userTasks Task
-            userInfo = getUserInfo(conv)
+            //var userTasks Task
+            userInfo := getUserInfo(conv)
                 // Check and see if the returned struct is equal to an empty struct -
             // this tells us if the returned object was null or not.
             if userInfo == (User{}) {
@@ -147,8 +147,10 @@ Lookup:
 }
 
 func main() {
-    fmt.Println("Welcome to TODO")
-    fmt.Println("===============")
+    fmt.Println("╔═════════════════╗")
+    fmt.Println("║ Welcome to TODO ║")
+    fmt.Println("╚═════════════════╝")
+    
     for {
         fmt.Printf("[Main menu] Select an option (u)sers, (t)asks, (q)uit: ")
         // Read the input
