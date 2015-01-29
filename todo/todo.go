@@ -7,6 +7,7 @@ import (
     "os"
     _ "reflect"
     "strconv"
+    "strings"
 )
 
 func lookupUser() {
@@ -51,7 +52,7 @@ Lookup:
 func lookupTask() {
 Lookup:
     for {
-        fmt.Printf("[Task lookup] Enter a user id, (b)ack, or (q)uit: ")
+        fmt.Printf("\n[Task lookup] Enter a user id, (b)ack, or (q)uit: ")
         // Read the input
         var text string
         _, err := fmt.Scanf("%s", &text)
@@ -70,20 +71,27 @@ Lookup:
         // Convert the text string into an int
         conv, err := strconv.Atoi(text)
         
-        if err == nil {
-            // Get the user info as a User struct
-            //var userTasks Task
-            userInfo := GetUserInfo(conv)
-                // Check and see if the returned struct is equal to an empty struct -
-            // this tells us if the returned object was null or not.
-            if userInfo == (User{}) {
-                fmt.Println("That user does not exist.\n")
-            } else {
-                fmt.Printf("User %d is %s %s (%s)\n\n", userInfo.Id, userInfo.Firstname, userInfo.Lastname, userInfo.Email)
-            }
-        } else {
+        if err != nil {
             fmt.Printf("%s is not a valid user id\n", text)
+            continue
         }
+
+        // Get the user info as a User struct
+        userInfo := GetUserInfo(conv)
+
+        // Check and see if the returned struct is equal to an empty struct -
+        // this tells us if the returned object was null or not.
+        if userInfo == (User{}) {
+            fmt.Println("That user does not exist.\n")
+            continue
+        }
+        titleString := "Tasks for " + userInfo.Firstname + " (" + userInfo.Email + "):"
+        fmt.Println(titleString)
+        fmt.Println(strings.Repeat("-",len(titleString)))
+
+        taskList := GetListofTasks(conv)
+        fmt.Println(taskList)
+
     }
 }
 
