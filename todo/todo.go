@@ -1,6 +1,7 @@
 package main
 
 import (
+    "database/sql"
     "fmt"
     _ "github.com/mattn/go-sqlite3"
     "log"
@@ -35,8 +36,13 @@ Lookup:
         if err == nil {
             // Get the user info as a User struct
             var userInfo User
-            userInfo = GetUserInfo(conv)
-                // Check and see if the returned struct is equal to an empty struct -
+            userInfo, err = GetUserInfo(conv, db)
+            
+            if err != nil {
+                fmt.Println(err)
+            }
+            
+            // Check and see if the returned struct is equal to an empty struct -
             // this tells us if the returned object was null or not.
             if userInfo == (User{}) {
                 fmt.Println("That user does not exist.\n")
@@ -77,7 +83,7 @@ Lookup:
         }
 
         // Get the user info as a User struct
-        userInfo := GetUserInfo(conv)
+        userInfo, _ := GetUserInfo(conv, db)
 
         // Check and see if the returned struct is equal to an empty struct -
         // this tells us if the returned object was null or not.
@@ -95,10 +101,14 @@ Lookup:
     }
 }
 
+var db *sql.DB
+
 func main() {
     fmt.Println("╔═════════════════╗")
     fmt.Println("║ Welcome to TODO ║")
     fmt.Println("╚═════════════════╝")
+
+    db = OpenDatabaseConnection()
 
     for {
         fmt.Printf("[Main menu] Select an option (u)sers, (t)asks, (q)uit: ")
@@ -112,6 +122,7 @@ func main() {
         switch text {
             case "q":
                 // Exit the program
+                CloseDatabaseConnection(db)
                 os.Exit(0);
             case "u":
                 lookupUser()
