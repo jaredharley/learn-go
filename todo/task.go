@@ -61,3 +61,27 @@ func GetListofTasks(id int, db *sql.DB) ([]string, error) {
 
 }
 
+// This function creates a new task for the specified user, using the provided
+// Task struct, and returns an error if it fails, and the id of the new task
+// if successful.
+func CreateNewTask(userid int, newTask Task, db *sql.DB) (int, error) {
+    newTaskId := -1
+    // Validate user id, error if not valid.
+    validUser, err := IsUserValid(userid, db)
+    if !validUser {
+        errString := fmt.Errorf("Invalid user id. %v", err)
+        return newTaskId, errString
+    }
+    
+    // Validate manditory task values, error if not valid.
+    // Required: user_id, title
+    if newTask.Title == "" {
+        return newTaskId, fmt.Errorf("Title is a required field.")
+    }
+    
+    // TODO: Create new task in the database, error on failure.
+    // TODO: Return the newly-created task id (if possible).
+    
+    
+    return newTaskId, nil
+}

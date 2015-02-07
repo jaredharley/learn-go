@@ -115,6 +115,13 @@ func main() {
     fmt.Println("╚═════════════════╝")
 
     db = OpenDatabaseConnection()
+    
+    //Test
+    var newTask Task
+    taskId, err := CreateNewTask(1, newTask, db)
+    fmt.Printf("Task id: %d, error: %v\n", taskId, err)
+    taskId, err = CreateNewTask(5, newTask, db)
+    fmt.Printf("Task id: %d, error: %v\n", taskId, err)
 
     for {
         fmt.Printf("[Main menu] Select an option (u)sers, (t)asks, (q)uit: ")
