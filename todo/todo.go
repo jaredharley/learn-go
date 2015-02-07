@@ -95,8 +95,14 @@ Lookup:
         fmt.Println(titleString)
         fmt.Println(strings.Repeat("-",len(titleString)))
 
-        taskList := GetListofTasks(conv)
-        fmt.Println(taskList)
+        taskList, err := GetListofTasks(conv, db)
+        if err != nil {
+            fmt.Println("Unable to retrieve list of tasks: ")
+            fmt.Println(err)
+        }
+        for i := 0; i < len(taskList); i++ {
+            fmt.Println(taskList[i])
+        }
 
     }
 }

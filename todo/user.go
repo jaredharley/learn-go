@@ -3,7 +3,6 @@ package main
 import (
     "database/sql"
     "errors"
-    _ "github.com/mattn/go-sqlite3"
 )
 
 // User struct
@@ -15,6 +14,14 @@ type User struct {
     Email       string
 }
 
+const getUserInfoSelect string = `SELECT id,
+                                         first_name,
+                                         last_name,
+                                         dob,
+                                         email
+                                    FROM users
+                                   WHERE users.id = ?`
+
 // Returns the user data from the database for the provided user id.
 func GetUserInfo(id int, db *sql.DB) (User, error) {
     var myUser User
@@ -24,7 +31,7 @@ func GetUserInfo(id int, db *sql.DB) (User, error) {
         return myUser, errors.New("Unable to connect to the database.")
     }
 
-    stmt, err := db.Prepare("SELECT * FROM users WHERE users.id = ?")
+    stmt, err := db.Prepare(getUserInfoSelect)
     if err != nil {
         return myUser, err
     }
