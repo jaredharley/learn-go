@@ -31,7 +31,7 @@ func GetListofTasks(id int, db *sql.DB) ([]string, error) {
                      due_date,
                      importance
                 FROM tasks
-               WHERE tasks.user_id = ?`
+               WHERE tasks.user_id = ?;`
 
     rows, err := db.Query(query, id)
     if err != nil {
@@ -64,8 +64,8 @@ func GetListofTasks(id int, db *sql.DB) ([]string, error) {
 // This function creates a new task for the specified user, using the provided
 // Task struct, and returns an error if it fails, and the id of the new task
 // if successful.
-func CreateNewTask(userid int, newTask Task, db *sql.DB) (int, error) {
-    newTaskId := -1
+func CreateNewTask(userid int, newTask Task, db *sql.DB) (int64, error) {
+    var newTaskId int64 = -1
     // Validate user id, error if not valid.
     validUser, err := IsUserValid(userid, db)
     if !validUser {
@@ -81,7 +81,40 @@ func CreateNewTask(userid int, newTask Task, db *sql.DB) (int, error) {
     
     // TODO: Create new task in the database, error on failure.
     // TODO: Return the newly-created task id (if possible).
+    query := `INSERT INTO tasks (
+                user_id,
+                title,
+                description,
+                due_date,
+                importance
+              ) values (
+                ?,
+                ?,
+                ?,
+                ?,
+                ?
+              );`
     
+    addTask, err := db.Prepare(query)
+    if err != nil {
+        return newTaskId, err
+    }
+    
+    // Start a new transaction
+    tx, err := db.Begin()
+    if err != nil {
+        tx.Rollback()
+        return newTaskId, err
+    }
+    
+    result, err := tx.Stmt(addTask).Exec(userid, newTask.Title, newTask.Description, newTask.Due_date, newTask.Importance)
+    if err != nil {
+        tx.Rollback()
+        return newTaskId, err
+    } else {
+        tx.Commit()
+        newTaskId, _ = result.LastInsertId()
+    }
     
     return newTaskId, nil
 }

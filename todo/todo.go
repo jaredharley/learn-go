@@ -118,9 +118,11 @@ func main() {
     
     //Test
     var newTask Task
+    newTask.Title = "New task test"
+    newTask.Description = "This is a test of the task insert code"
+    newTask.Due_date = "2015-02-14 00:00:00"
+    newTask.Importance = 1
     taskId, err := CreateNewTask(1, newTask, db)
-    fmt.Printf("Task id: %d, error: %v\n", taskId, err)
-    taskId, err = CreateNewTask(5, newTask, db)
     fmt.Printf("Task id: %d, error: %v\n", taskId, err)
 
     for {
