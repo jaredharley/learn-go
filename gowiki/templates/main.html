@@ -42,8 +42,15 @@
         <div class="page-header">
             <h1>{{.Title}}</h1>
         </div>
-        <div class="text-right"><p>[<a href="/console/edit/{{.Title}}">edit</a>]</p></div>
-        <div><p>{{printf "%s" .Body}}</p></div>
+        <div>
+          <ul>
+            {{ range .FileList }}
+              <li><a href="/console/edit/{{ printf "%s" . }}">{{ printf "%s" . }}</a></li>
+            {{ end }}
+          </ul></div>
+        <form action="/console/build" method="POST">
+          <input type="submit" value="Build" />
+        </form>
     </div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

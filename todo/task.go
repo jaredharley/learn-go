@@ -79,8 +79,6 @@ func CreateNewTask(userid int, newTask Task, db *sql.DB) (int64, error) {
         return newTaskId, fmt.Errorf("Title is a required field.")
     }
     
-    // TODO: Create new task in the database, error on failure.
-    // TODO: Return the newly-created task id (if possible).
     query := `INSERT INTO tasks (
                 user_id,
                 title,
