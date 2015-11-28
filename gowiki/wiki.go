@@ -33,7 +33,7 @@ var templates = template.Must(template.ParseFiles(td + "edit.html",
                                                   td + "view.html",
                                                   td + "main.html",))
 var validPath = regexp.MustCompile("^/console/(edit|save|view)/(.+)$")
-var fileDir = "/home/jared/test.jaredharley.com/_posts/"
+var fileDir = "/Users/jared/test.jaredharley.com/_posts/"
 
 // Save function
 // Saves the page to disk, using the page title as the filename, and writes
@@ -122,6 +122,7 @@ func buildFileList(dir string) []string {
 
 // Template renderer
 func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
+    fmt.Println(p)
     err := templates.ExecuteTemplate(w, tmpl + ".html", p)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
